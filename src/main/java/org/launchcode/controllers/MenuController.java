@@ -40,8 +40,9 @@ public class MenuController {
         model.addAttribute("title", "View " + viewMenu.getName());
 
         model.addAttribute("cheeses", viewMenu.getCheeses());
+        model.addAttribute("menu", viewMenu);
 
-        return "menu/view/" + id;
+        return "menu/view";
     }
 
     @RequestMapping(value = "add", method = RequestMethod.GET)
@@ -64,13 +65,13 @@ public class MenuController {
         Menu exist = menuDao.findByName(menu.getName());
 
         if(exist == null){
-            model.addAttribute("title", "Add Menu");
-            model.addAttribute("existingError", "Menu already exists.");
-            return "menu/add";
+            menuDao.save(menu);
+            return "redirect:/menu/view/" + String.valueOf(menu.getId());
         }
 
-        menuDao.save(menu);
-        return "redirect:/menu/view" + String.valueOf(menu.getId());
+        model.addAttribute("title", "Add Menu");
+        model.addAttribute("existingError", "Menu already exists.");
+        return "menu/add";
     }
 
     @RequestMapping(value="add-item/{id}", method = RequestMethod.GET)
@@ -78,6 +79,7 @@ public class MenuController {
 
         Menu menu = menuDao.findOne(Integer.parseInt(id));
         model.addAttribute(new AddMenuItemForm());
+        model.addAttribute("cheeses", cheeseDao.findAll());
         model.addAttribute("menu", menu);
         model.addAttribute("title", "Add Item to Menu: " + menu.getName());
 
@@ -102,7 +104,7 @@ public class MenuController {
 
         menu.addCheese(addCheese);
         menuDao.save(menu);
-        return "redirect:/menu/view" + String.valueOf(menu.getId());
+        return "redirect:/menu/view/" + String.valueOf(menu.getId());
     }
 
 
